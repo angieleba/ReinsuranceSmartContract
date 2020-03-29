@@ -132,12 +132,13 @@ function SendNewRequest() {
     console.log("====>" + selectedClause);
     console.log(to, ether, clause);
     
-//    var result = contractInstance.requestReinsuranceTransaction.sendTransaction(add, to, 0, 13, {from: add, gas: 221000});
-//     if(result){
-//         console.log(result);
-//     }
+   var result = contractInstance.requestReinsuranceTransaction.sendTransaction(add, to, 0, 13, {from: add, gas: 221000});
+   console.log(result);
+    
+   if(result){
+    }
 
-//     location.reload();
+    location.reload();
 }
 
 

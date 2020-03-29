@@ -1,7 +1,5 @@
-pragma experimental "ABIEncoderV2";
 pragma solidity "0.4.25";
-import "./Permissions.sol";
-import "../Strings.sol";
+import "../libraries/Strings.sol";
 
 contract ReinsuranceContract {
 
@@ -35,7 +33,7 @@ contract ReinsuranceContract {
     mapping(address => uint) ToMeRequestCount;
 
     constructor (address[] _companyAddresses, bytes32[] _companyNames, bytes32[] _contractClauses, bytes32[] _requestStatuses) public{
-        //require(_companyAddresses.length == _companyNames.length);
+        require(_companyAddresses.length == _companyNames.length);
 
         CompaniesList = _companyAddresses;
         ContractClausesList = _contractClauses;
@@ -237,7 +235,7 @@ contract ReinsuranceContract {
     //NOTE: STATUS SHOULD BE CHANGED ONLY FOR THE TO-ME REQUESTS
     function ChangeRequestStatus(int requestId, uint status) public isValidCompany(msg.sender) returns (bool) {
 
-       Request request = AllRequests[requestId];
+       Request storage request = AllRequests[requestId];
        request.Status = AllRequestStatuses[status];
         // if(status == Accepted){
         //     send ether to the TO address
