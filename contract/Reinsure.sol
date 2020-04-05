@@ -1,19 +1,23 @@
-pragma solidity "0.4.25";
-import "../libraries/Strings.sol";
+pragma experimental ABIEncoderV2;
+pragma solidity "0.4.26";
+import "Strings.sol";
 
 contract ReinsuranceContract {
 
     using Modifiers for bytes32;
     using Modifiers for int;
-
-    mapping(address => bytes32) private companies;
+    using Modifiers for string;
 
     bytes32[] private ContractClausesList;
-    bytes32[] private AllRequestStatuses;
     address[] private CompaniesList;
     int[] private AllRequestsIndexes;
+    string requested = 'Requested';
+    string progress = 'In Progress';
+    string denied = 'Denied';
+    string accepted = 'Accepted';
+    string canceled = 'Canceled';
 
-    //string[] RequestStatuses = ['Requested', 'In Progress', 'Denied', 'Accepted', 'Canceled'];
+    bytes32[] AllRequestStatuses = [requested.toBytes32(), progress.toBytes32(), denied.toBytes32(), accepted.toBytes32(), canceled.toBytes32()];
 
     struct Request {
         int Id;
@@ -32,17 +36,9 @@ contract ReinsuranceContract {
     mapping (address => uint) FromMeRequestCount;
     mapping(address => uint) ToMeRequestCount;
 
-    constructor (address[] _companyAddresses, bytes32[] _companyNames, bytes32[] _contractClauses, bytes32[] _requestStatuses) public{
-        require(_companyAddresses.length == _companyNames.length);
-
+constructor (address[] _companyAddresses, bytes32[] _contractClauses) public{
         CompaniesList = _companyAddresses;
         ContractClausesList = _contractClauses;
-        AllRequestStatuses = _requestStatuses;
-
-        for(uint i = 0; i < _companyAddresses.length; i++){
-            address companyAdd = _companyAddresses[i];
-            companies[companyAdd] = _companyNames[i];
-        }
      }
 
     function GetContractStatuses() public view returns (bytes32[]) {
@@ -66,13 +62,6 @@ contract ReinsuranceContract {
         return ContractClausesList;
     }
 
-    function GetCompanyName(address adressa) public view returns (string) {
-         require(validCompany(adressa));
-         bytes32 tempByte = companies[adressa];
-         return tempByte.toString();
-     }
-
-
     function validCompany(address companyAddress) view private returns (bool) {
         for(uint i = 0; i < CompaniesList.length; i++) {
             if (CompaniesList[i] == companyAddress) {
@@ -83,9 +72,7 @@ contract ReinsuranceContract {
     }
 
 
-    function requestReinsuranceTransaction(address from, address to, uint clauseId, uint payableEther) public isValidCompany(from) returns (bool) {
-        require(validCompany(to));
-
+    function RequestReinsuranceTransaction(address from, address to, uint clauseId, uint payableEther) public isValidCompany(from) returns (bool) {
         AllContractRequestsCount = AllContractRequestsCount + 1;
 
         Request storage requesttt = AllRequests[AllContractRequestsCount];
@@ -108,12 +95,11 @@ contract ReinsuranceContract {
         return true;
     }
 
-
-    function GetRequestDetailsById(int id) public view returns(int, address, address, string, string){
+    function GetRequestDetailsById(int id) public view returns(int, address, address, string){
        // require(id.Contains(AllRequestsIndexes));
 
         Request storage req = AllRequests[id];
-        return (req.Id, req.To, req.From, req.Status.toString(), req.ContractClause.toString());
+        return (req.Id, req.To, req.From, req.Status.toString());
     }
 
 
@@ -243,5 +229,5 @@ contract ReinsuranceContract {
         return true;
     }
 
-   // event NewRequest(address from, address to, uint clauseId, uint payableEther);
+   event NewRequest(address from, address to, uint clauseId, uint payableEther);
  }

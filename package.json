@@ -1,0 +1,30 @@
+{
+  "name": "ReinsuranceSmartContract",
+  "version": "1.0.0",
+  "description": "\"# ReinsuranceSmartContract\"",
+  "main": "index.js",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "fs": "0.0.1-security",
+    "lite-server": "^2.5.4",
+    "solc": "^0.4.26",
+    "solidity": "0.0.1",
+    "web3": "^0.20.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "lite-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angieleba/ReinsuranceSmartContract.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/angieleba/ReinsuranceSmartContract/issues"
+  },
+  "homepage": "https://github.com/angieleba/ReinsuranceSmartContract#readme"
+}

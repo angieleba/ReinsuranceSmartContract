@@ -1,15 +1,14 @@
-var interface = '[{"constant":true,"inputs":[],"name":"GetContractStatuses","outputs":[{"name":"","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"GetContractClauses","outputs":[{"name":"","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"clauseId","type":"uint256"},{"name":"payableEther","type":"uint256"}],"name":"requestReinsuranceTransaction","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"from","type":"address"}],"name":"GetAllRequestsFromMe","outputs":[{"name":"","type":"int256[]"},{"name":"","type":"address[]"},{"name":"","type":"address[]"},{"name":"","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"GetCompanies","outputs":[{"name":"","type":"address[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"adressa","type":"address"}],"name":"GetCompanyName","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"id","type":"int256"}],"name":"GetRequestDetailsById","outputs":[{"name":"","type":"int256"},{"name":"","type":"address"},{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"to","type":"address"}],"name":"GetAllRequestsToMe","outputs":[{"name":"","type":"int256[]"},{"name":"","type":"address[]"},{"name":"","type":"address[]"},{"name":"","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"Id","type":"int256"}],"name":"getRequestStatus","outputs":[{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"requestId","type":"int256"},{"name":"status","type":"uint256"}],"name":"ChangeRequestStatus","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"to","type":"address"}],"name":"GetRequestDetailsToMe","outputs":[{"name":"","type":"uint256[]"},{"name":"","type":"bytes32[]"},{"name":"","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"GetRequestIds","outputs":[{"name":"","type":"int256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"GetRequestsCount","outputs":[{"name":"","type":"int256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"from","type":"address"}],"name":"GetRequestDetailsFromMe","outputs":[{"name":"","type":"uint256[]"},{"name":"","type":"bytes32[]"},{"name":"","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_companyAddresses","type":"address[]"},{"name":"_companyNames","type":"bytes32[]"},{"name":"_contractClauses","type":"bytes32[]"},{"name":"_requestStatuses","type":"bytes32[]"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]';
 Web3 = require('web3');
-
 web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-abi = JSON.parse(interface);
 
+var interface = '[{"constant":true,"inputs":[],"name":"GetContractClauses","outputs":[{"name":"","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"from","type":"address"}],"name":"GetAllRequestsFromMe","outputs":[{"name":"","type":"int256[]"},{"name":"","type":"address[]"},{"name":"","type":"address[]"},{"name":"","type":"string[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"GetCompanies","outputs":[{"name":"","type":"address[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"id","type":"int256"}],"name":"GetRequestDetailsById","outputs":[{"name":"","type":"int256"},{"name":"","type":"address"},{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"to","type":"address"}],"name":"GetAllRequestsToMe","outputs":[{"name":"","type":"int256[]"},{"name":"","type":"address[]"},{"name":"","type":"address[]"},{"name":"","type":"string[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"Id","type":"int256"}],"name":"getRequestStatus","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"GetAvailableStatuses","outputs":[{"name":"","type":"string[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"requestId","type":"int256"},{"name":"status","type":"uint256"}],"name":"ChangeRequestStatus","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"to","type":"address"}],"name":"GetRequestDetailsToMe","outputs":[{"name":"","type":"uint256[]"},{"name":"","type":"bytes32[]"},{"name":"","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"clauseId","type":"uint256"},{"name":"payableEther","type":"uint256"}],"name":"RequestReinsuranceTransaction","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"GetRequestIds","outputs":[{"name":"","type":"int256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"GetRequestsCount","outputs":[{"name":"","type":"int256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"from","type":"address"}],"name":"GetRequestDetailsFromMe","outputs":[{"name":"","type":"uint256[]"},{"name":"","type":"bytes32[]"},{"name":"","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_companyAddresses","type":"address[]"},{"name":"_contractClauses","type":"bytes32[]"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"from","type":"address"},{"indexed":false,"name":"to","type":"address"},{"indexed":false,"name":"clauseId","type":"uint256"},{"indexed":false,"name":"payableEther","type":"uint256"}],"name":"NewRequest","type":"event"}]';
+abi = JSON.parse(interface);
 Contract = web3.eth.contract(abi);
-contractInstance = Contract.at('0xf83feb2c616b44732fe709b6e4a00c02a5f69981')
+contractInstance = Contract.at('0x4b24048e020c303e1f39b95dd1abddf168221aa6')
 
 
 $(document).ready(function() { 
-    var add = '0x1557b4561b80921dbed2cc8a659d2c5817cea77c';
+    var add = '0x37F1C9a322De17A358Bb42Bb4ff09d542140D331';
 
     document.getElementById('listOfCompanies');
     var options = [];
@@ -43,9 +42,6 @@ $(document).ready(function() {
     requestDetailsToMe = contractInstance.GetRequestDetailsToMe.call(add);
     const requestsToMeLength = requestsToMe[0].length;
 
-    console.log(requestsToMe);
-    console.log("Length: " + requestsToMeLength);
-
     listEl.forEach(function (item) {
         var option = "<option>" + item + "</option>"
         options.push(option);
@@ -70,7 +66,7 @@ $(document).ready(function() {
             From : requestsFromMe[FROM][i],
             To : requestsFromMe[TO][i],
             Status : web3.toUtf8(requestsFromMe[STATUS][i]),
-            Ether : requestDetailsFromMe[ETHER][i],
+            Ether : web3.fromWei(requestDetailsFromMe[ETHER][i], 'ether'),
             Reasons : requestDetailsFromMe[REASONS][i],
             Clause : web3.toUtf8(requestDetailsFromMe[CLAUSE][i]) 
         }
@@ -98,7 +94,7 @@ $(document).ready(function() {
             From : requestsToMe[FROM][i],
             To : requestsToMe[TO][i],
             Status : web3.toUtf8(requestsToMe[STATUS][i]),
-            Ether : requestDetailsToMe[ETHER][i],
+            Ether : web3.fromWei(requestDetailsToMe[ETHER][i], 'ether'),
             Reasons : requestDetailsToMe[REASONS][i],
             Clause :  web3.toUtf8(requestDetailsToMe[CLAUSE][i]) 
         }
@@ -122,7 +118,7 @@ $(document).ready(function() {
 
 //Sends a new request with status Requested
 function SendNewRequest() {
-    var add = '0x1557b4561b80921dbed2cc8a659d2c5817cea77c';
+    var add = '0x37F1C9a322De17A358Bb42Bb4ff09d542140D331';
     var to = document.getElementById("listOfCompanies").value;  
     var ether = document.getElementById("payableEther").value;
     var clause = document.getElementById("contractClauses").value;
@@ -132,7 +128,7 @@ function SendNewRequest() {
     console.log("====>" + selectedClause);
     console.log(to, ether, clause);
     
-   var result = contractInstance.requestReinsuranceTransaction.sendTransaction(add, to, 0, 13, {from: add, gas: 221000});
+   var result = contractInstance.RequestReinsuranceTransaction.sendTransaction(add, to, clause, web3.toWei(ether, "ether"), {from: add, gas: 300000});
    console.log(result);
     
    if(result){
@@ -144,5 +140,11 @@ function SendNewRequest() {
 
 //Function to change the status of the requests
 function ChangeRequestStatus( id,  status){
-    console.log(id, status);
+    $("#statuses").html('');
+    var listEl = contractInstance.GetAvailableStatuses.call();
+    listEl.forEach(element => {
+        console.log(element);
+        $("#statuses").append(new Option(element, "value"));
+    });
+    $("#ChangeStatusModal").modal('show');
 }
