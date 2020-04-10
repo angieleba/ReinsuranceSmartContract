@@ -1,14 +1,10 @@
 Web3 = require('web3');
 web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+Contract = web3.eth.contract(JSON.parse(contract.ABI));
+contractInstance = Contract.at(contract.address)
 
-var interface = '[{"constant":true,"inputs":[],"name":"GetContractClauses","outputs":[{"name":"","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"from","type":"address"}],"name":"GetAllRequestsFromMe","outputs":[{"name":"","type":"int256[]"},{"name":"","type":"address[]"},{"name":"","type":"address[]"},{"name":"","type":"string[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"GetCompanies","outputs":[{"name":"","type":"address[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"id","type":"int256"}],"name":"GetRequestDetailsById","outputs":[{"name":"","type":"int256"},{"name":"","type":"address"},{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"to","type":"address"}],"name":"GetAllRequestsToMe","outputs":[{"name":"","type":"int256[]"},{"name":"","type":"address[]"},{"name":"","type":"address[]"},{"name":"","type":"string[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"Id","type":"int256"}],"name":"getRequestStatus","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"GetAvailableStatuses","outputs":[{"name":"","type":"string[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"requestId","type":"int256"},{"name":"status","type":"uint256"}],"name":"ChangeRequestStatus","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"to","type":"address"}],"name":"GetRequestDetailsToMe","outputs":[{"name":"","type":"uint256[]"},{"name":"","type":"bytes32[]"},{"name":"","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"clauseId","type":"uint256"},{"name":"payableEther","type":"uint256"}],"name":"RequestReinsuranceTransaction","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"GetRequestIds","outputs":[{"name":"","type":"int256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"GetRequestsCount","outputs":[{"name":"","type":"int256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"from","type":"address"}],"name":"GetRequestDetailsFromMe","outputs":[{"name":"","type":"uint256[]"},{"name":"","type":"bytes32[]"},{"name":"","type":"bytes32[]"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_companyAddresses","type":"address[]"},{"name":"_contractClauses","type":"bytes32[]"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"from","type":"address"},{"indexed":false,"name":"to","type":"address"},{"indexed":false,"name":"clauseId","type":"uint256"},{"indexed":false,"name":"payableEther","type":"uint256"}],"name":"NewRequest","type":"event"}]';
-abi = JSON.parse(interface);
-Contract = web3.eth.contract(abi);
-contractInstance = Contract.at('0x4b24048e020c303e1f39b95dd1abddf168221aa6')
-
-
-$(document).ready(function() { 
-    var add = '0x37F1C9a322De17A358Bb42Bb4ff09d542140D331';
+$(document).ready(function () {
+    var add = web3.eth.accounts[0];
 
     document.getElementById('listOfCompanies');
     var options = [];
@@ -32,7 +28,7 @@ $(document).ready(function() {
 
     //Get all existing companies in the contract
     var listEl = contractInstance.GetCompanies.call();
-    var clausesList = contractInstance.GetContractClauses.call(); 
+    var clausesList = contractInstance.GetContractClauses.call();
 
     requestsFromMe = contractInstance.GetAllRequestsFromMe.call(add);
     requestDetailsFromMe = contractInstance.GetRequestDetailsFromMe.call(add);
@@ -43,108 +39,134 @@ $(document).ready(function() {
     const requestsToMeLength = requestsToMe[0].length;
 
     listEl.forEach(function (item) {
-        var option = "<option>" + item + "</option>"
-        options.push(option);
+        options.push(new Option(item));
     });
-
     $('#listOfCompanies').html(options);
 
     //Get all the clauses the contract covers
     clausesList.forEach(function (item) {
-        var clause = "<option value = "+ clausesList.indexOf(item) +">" + web3.toUtf8(item) + "</option>";
-
-        clauses.push(clause);
+        clauses.push(new Option(web3.toUtf8(item), clausesList.indexOf(item)));
     });
-
     $('#contractClauses').html(clauses);
 
 
     //1. Populate table of list of requests FROM ME
-    for(var i = 0; i < requestsFromMeLength; i++){
+    for (var i = 0; i < requestsFromMeLength; i++) {
         const Request = {
-            Id : requestsFromMe[ID][i],
-            From : requestsFromMe[FROM][i],
-            To : requestsFromMe[TO][i],
-            Status : web3.toUtf8(requestsFromMe[STATUS][i]),
-            Ether : web3.fromWei(requestDetailsFromMe[ETHER][i], 'ether'),
-            Reasons : requestDetailsFromMe[REASONS][i],
-            Clause : web3.toUtf8(requestDetailsFromMe[CLAUSE][i]) 
+            Id: requestsFromMe[ID][i],
+            From: requestsFromMe[FROM][i],
+            To: requestsFromMe[TO][i],
+            Status: web3.toUtf8(requestsFromMe[STATUS][i]),
+            Ether: web3.fromWei(requestDetailsFromMe[ETHER][i], 'ether'),
+            Reasons: requestDetailsFromMe[REASONS][i],
+            Clause: web3.toUtf8(requestDetailsFromMe[CLAUSE][i])
         }
 
         fromMeRequestStructs.push(Request);
     }
 
-    var tableRowsFrom = [];
+    var button = new Button("btn btn-outline-primary", "Change status",
+        new Function("ChangeRequestStatus",
+            [{
+                isProp: true,
+                param: "Id"
+            }, {
+                isProp: false,
+                param: "false"
+            }]));
 
-    for(var i = 0; i < fromMeRequestStructs.length; i++) {
-        var row = "<tr>"  
-        + "<td>" + fromMeRequestStructs[i].Id +"</td><td>" + fromMeRequestStructs[i].From +"</td><td>" + fromMeRequestStructs[i].To +"</td><td>" + fromMeRequestStructs[i].Clause +"</td><td>" + fromMeRequestStructs[i].Ether +"</td><td>" + fromMeRequestStructs[i].Status +"</td>" +
-        "<td><button type='button' class='btn btn-outline-primary' onclick='ChangeRequestStatus(" + fromMeRequestStructs[i].Id + "," + fromMeRequestStructs[i].Id + ");'>Change status</button></td>"
-        + "</tr>";
-        tableRowsFrom.push(row);
-    }
-
-    $('#fromMeRequestTable').html(tableRowsFrom);
-    //END OF FROM ME
+    BuildTable("fromMeRequestTable", fromMeRequestStructs, [button]);
 
     //2. Populate table of list of requests TO ME
-    for(var i = 0; i < requestsToMeLength; i++){
+    for (var i = 0; i < requestsToMeLength; i++) {
         const Request = {
-            Id : requestsToMe[ID][i],
-            From : requestsToMe[FROM][i],
-            To : requestsToMe[TO][i],
-            Status : web3.toUtf8(requestsToMe[STATUS][i]),
-            Ether : web3.fromWei(requestDetailsToMe[ETHER][i], 'ether'),
-            Reasons : requestDetailsToMe[REASONS][i],
-            Clause :  web3.toUtf8(requestDetailsToMe[CLAUSE][i]) 
+            Id: requestsToMe[ID][i],
+            From: requestsToMe[FROM][i],
+            To: requestsToMe[TO][i],
+            Status: web3.toUtf8(requestsToMe[STATUS][i]),
+            Ether: web3.fromWei(requestDetailsToMe[ETHER][i], 'ether'),
+            Reasons: requestDetailsToMe[REASONS][i],
+            Clause: web3.toUtf8(requestDetailsToMe[CLAUSE][i])
         }
 
         toMeRequestStructs.push(Request);
     }
 
-    var tableRowsTo = [];
+    var button = new Button("btn btn-outline-primary", "Change status",
+        new Function("ChangeRequestStatus",
+            [{
+                isProp: true,
+                param: "Id"
+            }, {
+                isProp: false,
+                param: "true"
+            }]));
 
-    for(var i = 0; i < toMeRequestStructs.length; i++) {
-        var row = "<tr>"  
-        + "<td>" + toMeRequestStructs[i].Id +"</td><td>" + toMeRequestStructs[i].From +"</td><td>" + toMeRequestStructs[i].To +"</td><td>" + toMeRequestStructs[i].Clause +"</td><td>" + toMeRequestStructs[i].Ether +"</td><td>" + toMeRequestStructs[i].Status +"</td>" +
-        "<td><button type='button' class='btn btn-outline-primary' onclick='ChangeRequestStatus(" + toMeRequestStructs[i].Id + "," + toMeRequestStructs[i].Id + ");'>Change status</button></td>"
-        + "</tr>";
-        tableRowsTo.push(row);
-    }
-
-    $('#toMeRequestTable').html(tableRowsTo);
-
+    BuildTable("toMeRequestTable", toMeRequestStructs, [button]);
 });
 
 //Sends a new request with status Requested
 function SendNewRequest() {
-    var add = '0x37F1C9a322De17A358Bb42Bb4ff09d542140D331';
-    var to = document.getElementById("listOfCompanies").value;  
+    var add = web3.eth.accounts[0];
+    var to = document.getElementById("listOfCompanies").value;
     var ether = document.getElementById("payableEther").value;
     var clause = document.getElementById("contractClauses").value;
-
-    var e = document.getElementById("contractClauses");
-    var selectedClause = e.options[e.selectedIndex].value;
-    console.log("====>" + selectedClause);
-    console.log(to, ether, clause);
-    
-   var result = contractInstance.RequestReinsuranceTransaction.sendTransaction(add, to, clause, web3.toWei(ether, "ether"), {from: add, gas: 300000});
-   console.log(result);
-    
-   if(result){
+    var one = 1;
+    var handleReceipt = (error, receipt) => {
+        if (error) console.error(error);
+        else {
+            console.log("=>", receipt);
+            //   res.json(receipt);
+        }
     }
 
-    location.reload();
+    var result = contractInstance.RequestReinsuranceTransaction.sendTransaction(add, to, clause, web3.toWei(ether, "ether"), { from: add, gas: 300000 }, handleReceipt);
+    console.log(result);
+    //location.reload();
 }
 
 
 //Function to change the status of the requests
-function ChangeRequestStatus( id,  status){
+function ChangeRequestStatus(id, toMe) {
+    var statusList = [];
+    if (toMe) {
+        statusList = ['In Progress', 'Accepted', 'Denied'];
+    } else {
+        statusList = ['Canceled'];
+    }
+
     $("#statuses").html('');
+    $("#requestId").val(id);
+
     var listEl = contractInstance.GetAvailableStatuses.call();
     listEl.forEach(element => {
-        console.log(element);
-        $("#statuses").append(new Option(element, "value"));
+        var el = web3.toUtf8(element);
+        if (statusList.includes(el)) {
+            $("#statuses").append(new Option(el));
+        }
     });
     $("#ChangeStatusModal").modal('show');
+}
+
+function ChangeStatus() {
+    var opt = $("#statuses").val();
+    var id =  $("#requestId").val();
+    console.log(opt, id);
+    var result = contractInstance.ChangeRequestStatus.call(id, 'Accepted');
+    console.log(result);
+}
+
+class Button {
+    constructor(className, label, func) {
+        this._className = className;
+        this._label = label;
+        this._function = func;
+    }
+}
+
+class Function {
+    constructor(name, params) {
+        this._name = name;
+        this._params = params;
+    }
 }

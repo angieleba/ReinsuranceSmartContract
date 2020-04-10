@@ -1,23 +1,17 @@
 pragma experimental ABIEncoderV2;
 pragma solidity "0.4.26";
-import "Strings.sol";
+import "../Strings.sol";
 
 contract ReinsuranceContract {
 
-    using Modifiers for bytes32;
-    using Modifiers for int;
     using Modifiers for string;
+    using Modifiers for bytes32;
 
     bytes32[] private ContractClausesList;
     address[] private CompaniesList;
     int[] private AllRequestsIndexes;
-    string requested = 'Requested';
-    string progress = 'In Progress';
-    string denied = 'Denied';
-    string accepted = 'Accepted';
-    string canceled = 'Canceled';
 
-    bytes32[] AllRequestStatuses = [requested.toBytes32(), progress.toBytes32(), denied.toBytes32(), accepted.toBytes32(), canceled.toBytes32()];
+    bytes32[] AllRequestStatuses = new bytes32[](5);
 
     struct Request {
         int Id;
@@ -36,12 +30,13 @@ contract ReinsuranceContract {
     mapping (address => uint) FromMeRequestCount;
     mapping(address => uint) ToMeRequestCount;
 
-constructor (address[] _companyAddresses, bytes32[] _contractClauses) public{
+constructor (address[] _companyAddresses, bytes32[] _contractClauses, bytes32[] _requestStatuses) public{
         CompaniesList = _companyAddresses;
         ContractClausesList = _contractClauses;
+        AllRequestStatuses = _requestStatuses;
      }
 
-    function GetContractStatuses() public view returns (bytes32[]) {
+    function GetAvailableStatuses() public view returns (bytes32[]) {
         return AllRequestStatuses;
     }
 
@@ -52,6 +47,16 @@ constructor (address[] _companyAddresses, bytes32[] _contractClauses) public{
     modifier isValidCompany(address toValidate) {
         require(validCompany(toValidate));
         _;
+    }
+
+    function isValidStatus(bytes32 status) view private returns (bool){
+        bool ok = false;
+         for(uint i = 0; i < AllRequestStatuses.length; i++) {
+             if(AllRequestStatuses[i] == status) {
+                 ok = true;
+             }
+         }
+         return ok;
     }
 
     function GetCompanies() public view returns (address[]) {
@@ -95,12 +100,12 @@ constructor (address[] _companyAddresses, bytes32[] _contractClauses) public{
         return true;
     }
 
-    function GetRequestDetailsById(int id) public view returns(int, address, address, string){
-       // require(id.Contains(AllRequestsIndexes));
+    // function GetRequestDetailsById(int id) public view returns(int, address, address, string){
+    //    // require(id.Contains(AllRequestsIndexes));
 
-        Request storage req = AllRequests[id];
-        return (req.Id, req.To, req.From, req.Status.toString());
-    }
+    //     Request storage req = AllRequests[id];
+    //     return (req.Id, req.To, req.From, req.Status.toString());
+    // }
 
 
     function GetRequestsCount() public view returns (int){
@@ -218,15 +223,17 @@ constructor (address[] _companyAddresses, bytes32[] _contractClauses) public{
         return (disponibleEthers, statusReasons, contractClauses);
     }
 
-    //NOTE: STATUS SHOULD BE CHANGED ONLY FOR THE TO-ME REQUESTS
-    function ChangeRequestStatus(int requestId, uint status) public isValidCompany(msg.sender) returns (bool) {
+    function ChangeRequestStatus(int requestId, bytes32 status) public isValidCompany(msg.sender) returns (bool) {
+       require(isValidStatus(status));
 
-       Request storage request = AllRequests[requestId];
-       request.Status = AllRequestStatuses[status];
-        // if(status == Accepted){
-        //     send ether to the TO address
-        // }
-        return true;
+       Request storage request = AllRequests[requestId];     
+       request.Status = status;
+
+        if(keccak256(abi.encodePacked(status.toString())) == keccak256(abi.encodePacked("Accepted"))){
+            return true;          
+        }
+
+        return false;
     }
 
    event NewRequest(address from, address to, uint clauseId, uint payableEther);
