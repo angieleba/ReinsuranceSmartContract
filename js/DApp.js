@@ -60,7 +60,7 @@ function ChangeStatus() {
 }
 
 function ReloadData(add) {
-    
+    $("#user").html("Welcome, <b>" + add + "</b>");
     var event = contractInstance.ReceivedPayment();
     event.watch(function(error, result){
         // result contains non-indexed arguments and topics
