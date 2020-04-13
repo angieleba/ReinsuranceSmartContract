@@ -2,9 +2,9 @@ function BuildTable(tableId, array, buttons) {
     var tableRows = [];
     for (var i = 0; i < array.length; i++) {     
         var row = GetRow( 
-        [array[i].Id,
-        array[i].From,
+        [array[i].Id,       
         array[i].To,
+        array[i].From,
         array[i].Clause,
         array[i].Ether,
         array[i].Status], buttons, array[i]);
@@ -20,7 +20,7 @@ function GetRow(columns, buttons, obj) {
         row = row.concat(GetColumn(element));
     });
 
-    if (buttons.length > 0 && obj.Status !== 'Canceled') {
+    if (buttons.length > 0 && !(obj.Status === 'Canceled' || obj.Status === 'Denied' || obj.Status === 'Accepted')) {
         buttons.forEach(element => {
             row = row.concat(GetButton(element, obj));
         });

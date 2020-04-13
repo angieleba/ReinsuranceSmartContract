@@ -13,9 +13,9 @@ console.log("Deploying of contract is in progress...");
 abiDefinition = JSON.parse(compiledContract.contracts['Reinsure.sol:ReinsuranceContract'].interface);
 Contract = web3.eth.contract(abiDefinition)
 bytecode = '0x'+compiledContract.contracts['Reinsure.sol:ReinsuranceContract'].bytecode;
-deployedContract = Contract.new(['0x0476D588631b6bAb2e35cDAC8550818672314De5', '0x0cA8B34827fDF917c285C76d18746792c3Eeb63a', 
-'0x9257470aE10c3d46a2B39d791ddb30f39c1E57a3'], 
-['Clause 1', 'Clause 2'],['Requested', 'In Progress', 'Denied', 'Accepted', 'Canceled'], {data: bytecode, from: web3.eth.accounts[0], gas: 6780000}, 
+deployedContract = Contract.new(['0x4097E6D5FB7e89D0AF75ea093Be453FBFc36515b', '0x5BC93671913e9728cb41583D8d35ef45aDa9Cc98', 
+'0x343D9A4073F0041D13d09ffa855b830543B3be8d'], 
+['Clause 1', 'Clause 2'],['Requested', 'In Progress', 'Denied', 'Accepted', 'Canceled'], {data: bytecode, from: web3.eth.accounts[0], gas: 6000000}, 
 function (err, deployedContract) {
 if (deployedContract.address) {
         console.log(`Address: ${deployedContract.address}`);

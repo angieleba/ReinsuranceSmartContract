@@ -1,10 +1,73 @@
 Web3 = require('web3');
 web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+
 Contract = web3.eth.contract(JSON.parse(contract.ABI));
-contractInstance = Contract.at(contract.address)
+contractInstance = Contract.at(contract.address);
+add = null;
+// window.ethereum.on('load', function () {   
+//     let currentAccount =  getAccount();
+//     console.log("=>", currentAccount);
+//     ReloadData(currentAccount);
+// });
 
 $(document).ready(function () {
-    var add = web3.eth.accounts[0];
+    window.ethereum.on('accountsChanged', function (accounts) {
+        console.log("Changed", accounts[0]);
+        add = accounts[0];
+        ReloadData(accounts[0]);
+      });
+});
+
+ function getAccount() {
+    const accounts = ethereum.enable();
+    const account = accounts[0];
+    return account;
+}
+//Sends a new request with status Requested
+function SendNewRequest() {
+    var to = document.getElementById("listOfCompanies").value;
+    var ether = document.getElementById("payableEther").value;
+    var clause = document.getElementById("contractClauses").value;
+
+    var result = contractInstance.RequestReinsuranceTransaction.sendTransaction(add, to, clause, web3.toWei(ether, "ether"), { from: add, gas: 300000 });
+    var transReceipt = web3.eth.getTransactionReceipt(result);
+    if (transReceipt.status == '0x1') {
+        alert("Request successfully created!");
+        //location.reload();
+    } else {
+        alert("Something went wrong. Please try again.");
+    }
+}
+
+function ChangeStatus() {
+    var status = $("#statuses").val();
+    var id =  $("#requestId").val();
+
+    var amount = contractInstance.GetRequestAmount.call(id);
+    var receipt = contractInstance.ChangeRequestStatus.sendTransaction(id, status, { from: add, gas: 65000, value:amount });
+
+    var transReceipt = web3.eth.getTransactionReceipt(receipt);
+    console.log(transReceipt);
+    if(transReceipt.status == '0x1') {
+        alert("Status successfully changed!");
+        $("#ChangeStatusModal").modal('hide');
+        //location.reload();
+    } else {
+        alert("Something went wrong. Please try again");
+        $("#ChangeStatusModal").modal('hide');
+        //location.reload();
+    }
+}
+
+function ReloadData(add) {
+    
+    var event = contractInstance.ReceivedPayment();
+    event.watch(function(error, result){
+        // result contains non-indexed arguments and topics
+        // given to the `Deposit` call.
+        if (!error)
+            console.log("Log results:", result);
+    });
 
     document.getElementById('listOfCompanies');
     var options = [];
@@ -29,11 +92,9 @@ $(document).ready(function () {
     //Get all existing companies in the contract
     var listEl = contractInstance.GetCompanies.call();
     var clausesList = contractInstance.GetContractClauses.call();
-
     requestsFromMe = contractInstance.GetAllRequestsFromMe.call(add);
     requestDetailsFromMe = contractInstance.GetRequestDetailsFromMe.call(add);
     const requestsFromMeLength = requestsFromMe[0].length;
-
     requestsToMe = contractInstance.GetAllRequestsToMe.call(add);
     requestDetailsToMe = contractInstance.GetRequestDetailsToMe.call(add);
     const requestsToMeLength = requestsToMe[0].length;
@@ -65,7 +126,7 @@ $(document).ready(function () {
         fromMeRequestStructs.push(Request);
     }
 
-    var button = new Button("btn btn-outline-primary", "Change status",
+    var button = new Button("btn btn-outline-primary", "Update",
         new Function("ChangeRequestStatus",
             [{
                 isProp: true,
@@ -92,7 +153,7 @@ $(document).ready(function () {
         toMeRequestStructs.push(Request);
     }
 
-    var button = new Button("btn btn-outline-primary", "Change status",
+    var button = new Button("btn btn-outline-primary", "Update",
         new Function("ChangeRequestStatus",
             [{
                 isProp: true,
@@ -103,30 +164,8 @@ $(document).ready(function () {
             }]));
 
     BuildTable("toMeRequestTable", toMeRequestStructs, [button]);
-});
-
-//Sends a new request with status Requested
-function SendNewRequest() {
-    var add = web3.eth.accounts[0];
-    var to = document.getElementById("listOfCompanies").value;
-    var ether = document.getElementById("payableEther").value;
-    var clause = document.getElementById("contractClauses").value;
-    var one = 1;
-    var handleReceipt = (error, receipt) => {
-        if (error) console.error(error);
-        else {
-            console.log("=>", receipt);
-            //   res.json(receipt);
-        }
-    }
-
-    var result = contractInstance.RequestReinsuranceTransaction.sendTransaction(add, to, clause, web3.toWei(ether, "ether"), { from: add, gas: 300000 }, handleReceipt);
-    console.log(result);
-    //location.reload();
 }
 
-
-//Function to change the status of the requests
 function ChangeRequestStatus(id, toMe) {
     var statusList = [];
     if (toMe) {
@@ -146,14 +185,6 @@ function ChangeRequestStatus(id, toMe) {
         }
     });
     $("#ChangeStatusModal").modal('show');
-}
-
-function ChangeStatus() {
-    var opt = $("#statuses").val();
-    var id =  $("#requestId").val();
-    console.log(opt, id);
-    var result = contractInstance.ChangeRequestStatus.call(id, 'Accepted');
-    console.log(result);
 }
 
 class Button {

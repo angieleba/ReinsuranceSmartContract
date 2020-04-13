@@ -11,3 +11,8 @@
     padding-top: 50px;
     padding-bottom: 50px;
 }
+
+.custom_table {
+    background-color: white;
+    color: #20509e;
+}

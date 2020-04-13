@@ -1,11 +1,11 @@
 pragma experimental ABIEncoderV2;
 pragma solidity "0.4.26";
-import "../Strings.sol";
+//import "Strings.sol";
 
 contract ReinsuranceContract {
 
-    using Modifiers for string;
-    using Modifiers for bytes32;
+    // using Modifiers for string;
+    // using Modifiers for bytes32;
 
     bytes32[] private ContractClausesList;
     address[] private CompaniesList;
@@ -36,27 +36,33 @@ constructor (address[] _companyAddresses, bytes32[] _contractClauses, bytes32[] 
         AllRequestStatuses = _requestStatuses;
      }
 
-    function GetAvailableStatuses() public view returns (bytes32[]) {
-        return AllRequestStatuses;
-    }
-
-    function getRequestStatus(int Id) public view returns (bytes32) {
-        return AllRequests[Id].Status;
-    }
-
     modifier isValidCompany(address toValidate) {
         require(validCompany(toValidate));
         _;
     }
 
-    function isValidStatus(bytes32 status) view private returns (bool){
-        bool ok = false;
-         for(uint i = 0; i < AllRequestStatuses.length; i++) {
-             if(AllRequestStatuses[i] == status) {
-                 ok = true;
-             }
-         }
-         return ok;
+    function GetAvailableStatuses() public view returns (bytes32[]) {
+        return AllRequestStatuses;
+    }
+
+    function GetRequestDetailsById(int id) public view returns(int, address, address, uint){
+       // require(id.Contains(AllRequestsIndexes));
+
+        Request storage req = AllRequests[id];
+        return (req.Id, req.To, req.From, req.EtherDisposablePayment);
+    }
+
+    function GetRequestAmount(int reqId) public view returns (uint) {
+        Request storage request = AllRequests[reqId]; 
+        return request.EtherDisposablePayment;
+    }
+
+    function GetRequestsCount() public view returns (int){
+        return AllContractRequestsCount;
+    }
+
+    function GetRequestIds() public view returns (int[]) {
+        return AllRequestsIndexes;
     }
 
     function GetCompanies() public view returns (address[]) {
@@ -76,45 +82,14 @@ constructor (address[] _companyAddresses, bytes32[] _contractClauses, bytes32[] 
         return false;
     }
 
-
-    function RequestReinsuranceTransaction(address from, address to, uint clauseId, uint payableEther) public isValidCompany(from) returns (bool) {
-        AllContractRequestsCount = AllContractRequestsCount + 1;
-
-        Request storage requesttt = AllRequests[AllContractRequestsCount];
-
-        requesttt.Id = AllContractRequestsCount;
-        requesttt.To = to;
-        requesttt.From = from;
-        requesttt.ContractClause = ContractClausesList[clauseId];
-        requesttt.EtherDisposablePayment = payableEther;
-        requesttt.Status = AllRequestStatuses[0];
-
-        AllRequestsIndexes.push(AllContractRequestsCount);
-
-        uint tempCountFrom = FromMeRequestCount[from];
-        FromMeRequestCount[from] = tempCountFrom + 1;
-
-        uint tempCountTo = ToMeRequestCount[to];
-        ToMeRequestCount[to] = tempCountTo + 1;
-
-        return true;
-    }
-
-    // function GetRequestDetailsById(int id) public view returns(int, address, address, string){
-    //    // require(id.Contains(AllRequestsIndexes));
-
-    //     Request storage req = AllRequests[id];
-    //     return (req.Id, req.To, req.From, req.Status.toString());
-    // }
-
-
-    function GetRequestsCount() public view returns (int){
-        return AllContractRequestsCount;
-    }
-
-
-    function GetRequestIds() public view returns (int[]) {
-        return AllRequestsIndexes;
+    function isValidStatus(bytes32 status) view private returns (bool){
+        bool ok = false;
+         for(uint i = 0; i < AllRequestStatuses.length; i++) {
+             if(AllRequestStatuses[i] == status) {
+                 ok = true;
+             }
+         }
+        return ok;
     }
 
     //Return all system requests made by my address 
@@ -223,18 +198,58 @@ constructor (address[] _companyAddresses, bytes32[] _contractClauses, bytes32[] 
         return (disponibleEthers, statusReasons, contractClauses);
     }
 
-    function ChangeRequestStatus(int requestId, bytes32 status) public isValidCompany(msg.sender) returns (bool) {
-       require(isValidStatus(status));
+    function RequestReinsuranceTransaction(address from, address to, uint clauseId, uint payableEther) public isValidCompany(from) {
+        AllContractRequestsCount = AllContractRequestsCount + 1;
+
+        Request storage requesttt = AllRequests[AllContractRequestsCount];
+
+        requesttt.Id = AllContractRequestsCount;
+        requesttt.To = to;
+        requesttt.From = from;
+        requesttt.ContractClause = ContractClausesList[clauseId];
+        requesttt.EtherDisposablePayment = payableEther;
+        requesttt.Status = AllRequestStatuses[0];
+
+        AllRequestsIndexes.push(AllContractRequestsCount);
+
+        uint tempCountFrom = FromMeRequestCount[from];
+        FromMeRequestCount[from] = tempCountFrom + 1;
+
+        uint tempCountTo = ToMeRequestCount[to];
+        ToMeRequestCount[to] = tempCountTo + 1;
+    }
+
+    function ChangeRequestStatus(int requestId, bytes32 status) public payable isValidCompany(msg.sender) returns (bool) {
+    require(isValidStatus(status));
 
        Request storage request = AllRequests[requestId];     
        request.Status = status;
+       string memory accepted = 'Accepted';
 
-        if(keccak256(abi.encodePacked(status.toString())) == keccak256(abi.encodePacked("Accepted"))){
-            return true;          
-        }
-
+        if(toBytes32(accepted) == status && request.To == msg.sender){
+            request.From.transfer(request.EtherDisposablePayment); 
+            emit ReceivedPayment(request.From, request.To, request.EtherDisposablePayment);  
+            return true;         
+        } 
         return false;
     }
 
-   event NewRequest(address from, address to, uint clauseId, uint payableEther);
- }
+    function fallback() external payable {
+        //Nothing to do
+        emit ReceivedPaymentContract(msg.sender, msg.value);
+     }
+
+    event ReceivedPayment(address from, address to, uint payment);
+    event ReceivedPaymentContract(address from, uint256 payment);
+
+   function toBytes32(string memory source) private pure returns (bytes32 result) {
+        bytes memory tempEmptyStringTest = bytes(source);
+        if (tempEmptyStringTest.length == 0) {
+            return 0x0;
+        }
+
+        assembly {
+            result := mload(add(source, 32))
+        }
+    }
+}
