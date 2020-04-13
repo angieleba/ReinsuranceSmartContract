@@ -1,5 +1,3 @@
-// Web3 = require('web3');
-// web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 add = null;
 contractInstance = null;
 
@@ -17,7 +15,6 @@ window.addEventListener('load', function () {
     // Check the connection
     if (!web3.isConnected()) {
         console.error("Not connected");
-
     }
 
     var add = web3.eth.accounts[0];
@@ -44,7 +41,7 @@ function SendNewRequest() {
     var ether = document.getElementById("payableEther").value;
     var clause = document.getElementById("contractClauses").value;
 
-    var result = contractInstance.RequestReinsuranceTransaction
+    contractInstance.RequestReinsuranceTransaction
         .sendTransaction(add, to, clause, web3.toWei(ether, "ether"), { from: add, gas: 300000 }, function (err, result) {
             if (!err) {
                 web3.eth.getTransactionReceipt(result, function(err, transReceipt) {
@@ -68,12 +65,16 @@ function ChangeStatus() {
     var id = $("#requestId").val();
     add = web3.eth.accounts[0];
 
-    var amount = contractInstance.GetRequestAmount.call(id, function (err, receipt) {
-        console.log(receipt);
-    });
+    contractInstance.GetRequestAmount.call(id, function (err, result) {
+        var amount = 0;
+        if(status == 'Accepted') {
+            amount = result;
+        }
 
-    var receipt = contractInstance.ChangeRequestStatus
-        .sendTransaction(id, status, { from: add, gas: 65000, value: amount }, function (err, receipt) {
+        console.log(amount);
+
+        contractInstance.ChangeRequestStatus
+            .sendTransaction(id, status, { from: add, gas: 65000, value: amount }, function (err, receipt) {
             if (!err) {
                 web3.eth.getTransactionReceipt(receipt, function (err, transReceipt) {
                     if (transReceipt.status == '0x1') {
@@ -87,6 +88,9 @@ function ChangeStatus() {
                 });
             }
         });
+    });
+ 
+
 }
 
 function ReloadData(add) {
@@ -171,8 +175,6 @@ function ReloadData(add) {
             BuildTable("fromMeRequestTable", fromMeRequestStructs, [button]);
         });
     });
-
-
 
     contractInstance.GetAllRequestsToMe.call(add, function (err, result) {
         requestsToMeLength = result[0].length;
