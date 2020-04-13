@@ -42,11 +42,11 @@
 			</a>
 			<div class="responsive-bar"><i class="fa fa-bars"></i></div>
 			<a href="" class="user"><i class="fa fa-user"></i></a>
-			<a href="" class="site-btn">New Request</a>
+			<a href="#newRequestContainer" class="site-btn">New Request</a>
 			<nav class="main-menu">
 				<ul class="menu-list">
-					<li><a href="">My requests</a></li>
-					<li><a href="">Requests to me</a></li>
+					<li><a href="#requestsFromMe">My requests</a></li>
+					<li><a href="#requestsToYou">Requests to me</a></li>
 				</ul>
 			</nav>
 		</div>
@@ -62,7 +62,7 @@
 					<h2>Invest in <br>Ethereum Trading</h2>
 					<h4>Use modern progressive technologies of Ethereum to earn money</h4>
 					<form class="hero-subscribe-from">
-						<button class="site-btn sb-gradients">New Request</button>
+						<a class="site-btn sb-gradients" href="#newRequestContainer">New Request</a>
 					</form>
 				</div>
 				<div class="col-md-6">
@@ -73,7 +73,7 @@
 	</section>
 
 	<section class="contact-page spad">					
-		<div class="container">		
+		<div class="container" id="newRequestContainer">		
 			<div class="row">
 			<div class="col-lg-2"></div>
 				<div class="col-lg-8">
@@ -118,7 +118,7 @@
 		</div>
 	</section>
 
-	<section class="features-section spad gradient-bg">
+	<section class="features-section spad gradient-bg" id="requestsToYou">
 		<div class="container text-white">
 			<div class="section-title text-center">
 				<h2>Requests sent to you</h2>
@@ -148,7 +148,7 @@
 		</div>
 	</section>
 	
-	<section class="features-section spad gradient-bg">
+	<section class="features-section spad gradient-bg" id="requestsFromMe">
 		<div class="container text-white">
 			<div class="section-title text-center">
 				<h2>Requests sent from you</h2>
@@ -255,5 +255,6 @@
 	<script src="contract_declaration.js"></script>
 	<script src="js/DApp.js"></script>
 	<script src="js/Table.js"></script>
+	<script src="js/notify.min.js"></script>
 </body>
 </html>

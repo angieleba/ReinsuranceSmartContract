@@ -31,7 +31,7 @@ function GetRow(columns, buttons, obj) {
 }
 
 function GetButton(button, obj) {
-    var buttonStr = "<td><button type='button' ";
+    var buttonStr = "<td class='buttonColumn'><button type='button' ";
     var buttonStr = buttonStr.concat("class='" + button._className + "' ", 
     "onclick='" + button._function._name + "(");
 

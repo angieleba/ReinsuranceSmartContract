@@ -32,10 +32,11 @@ function SendNewRequest() {
     var result = contractInstance.RequestReinsuranceTransaction.sendTransaction(add, to, clause, web3.toWei(ether, "ether"), { from: add, gas: 300000 });
     var transReceipt = web3.eth.getTransactionReceipt(result);
     if (transReceipt.status == '0x1') {
-        alert("Request successfully created!");
-        //location.reload();
+        $.notify("Request successfully created!", "success");
+        ReloadData(add);
+        window.location.href = "#fromMeRequestTable";
     } else {
-        alert("Something went wrong. Please try again.");
+        $.notify("Something went wrong. Please try again.", "error");
     }
 }
 
@@ -49,13 +50,12 @@ function ChangeStatus() {
     var transReceipt = web3.eth.getTransactionReceipt(receipt);
     console.log(transReceipt);
     if(transReceipt.status == '0x1') {
-        alert("Status successfully changed!");
         $("#ChangeStatusModal").modal('hide');
-        //location.reload();
+        $.notify("Status successfully changed!", "success");
+        ReloadData(add);
     } else {
-        alert("Something went wrong. Please try again");
+        $.notify("Something went wrong. Please try again.", "error");
         $("#ChangeStatusModal").modal('hide');
-        //location.reload();
     }
 }
 

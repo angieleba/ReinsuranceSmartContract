@@ -49,32 +49,6 @@ $(window).on('load', function() {
 		review_meta.trigger('next.owl.carousel');
 	});
 
-	review_meta.owlCarousel({
-		loop: true,
-		nav: false,
-		dots: true,
-		items: 3,
-		center: true,
-		margin: 20,
-		autoplay: true,
-		mouseDrag: false,
-	});
-
-
-	review_text.owlCarousel({
-		loop: true,
-		nav: true,
-		dots: false,
-		items: 1,
-		margin: 20,
-		autoplay: true,
-		navText: ['<i class="ti-angle-left"><i>', '<i class="ti-angle-right"><i>'],
-		animateOut: 'fadeOutDown',
-    	animateIn: 'fadeInDown',
-	});
-
-
-
 	 /*------------------
 		Contact Form
 	--------------------*/
